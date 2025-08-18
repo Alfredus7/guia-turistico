@@ -6,7 +6,6 @@
     <title>@ViewData["Title"] - guia_turistico</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/guia_turistico.styles.css" asp-append-version="true" />
 </head>
 <body>
     <header>
@@ -31,11 +30,12 @@
             </div>
         </nav>
     </header>
-    <div class="container">
+
+    <content class="container">
         <main role="main" class="pb-3">
             @RenderBody()
         </main>
-    </div>
+    </content>
 
     <footer class="border-top footer text-muted">
         <div class="container">
