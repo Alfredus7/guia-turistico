@@ -1,12 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using guia_turistico.Data;
+using guia_turistico.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using guia_turistico.Data;
-using guia_turistico.Models;
+using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace guia_turistico.Controllers
 {
@@ -57,17 +58,22 @@ namespace guia_turistico.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Nombre,Descripcion,DescripcionIngles,DescripcionPortugues,Direccion,Latitud,Longitud,TipoId")] SitioTuristico sitioTuristico)
+        public async Task<IActionResult> Create(SitioTuristico sitio)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(sitioTuristico);
+                // Asegurar que las coordenadas se lean con punto decimal
+                sitio.Latitud = Convert.ToDouble(sitio.Latitud.ToString(), CultureInfo.InvariantCulture);
+                sitio.Longitud = Convert.ToDouble(sitio.Longitud.ToString(), CultureInfo.InvariantCulture);
+
+                _context.Add(sitio);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["TipoId"] = new SelectList(_context.Tipos, "TipoId", "Nombre", sitioTuristico.TipoId);
-            return View(sitioTuristico);
+            ViewData["TipoId"] = new SelectList(_context.Tipos, "TipoId", "Nombre", sitio.TipoId);
+            return View(sitio);
         }
+
 
         // GET: SitioTuristicoes/Edit/5
         public async Task<IActionResult> Edit(int? id)
