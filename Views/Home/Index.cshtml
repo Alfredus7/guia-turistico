@@ -1,51 +1,48 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+﻿@model IEnumerable<guia_turistico.Models.Tipo>
+
+@{
+    ViewData["Title"] = "Inicio - Guía Turística";
 }
 
 <!-- Encabezado -->
-<header>
-    <div class="container text-center">
-        <h1>Descubre los mejores destinos turísticos</h1>
-        <p>Explora, aprende y vive experiencias únicas</p>
+<header class="bg-light py-5 text-center">
+    <div class="container">
+        <h1 class="fw-bold">Descubre los mejores destinos turísticos</h1>
+        <p class="lead text-muted">Explora, aprende y vive experiencias únicas con nuestra guía</p>
     </div>
 </header>
 
-<!-- Sección de Destinos -->
+<!-- Sección de Tipos de Tours -->
 <div class="container my-5">
-    <h2 class="text-center mb-4">Destinos Destacados</h2>
+    <h2 class="text-center mb-4">Tipos de Tours y Experiencias</h2>
     <div class="row g-4">
-        <!-- Card 1 -->
-        <div class="col-12 col-md-6 col-lg-4">
-            <div class="card h-100 shadow-sm">
-                <img src="/images/destino1.jpg" class="card-img-top" alt="Destino 1">
-                <div class="card-body d-flex flex-column">
-                    <h5 class="card-title">Lago Titicaca</h5>
-                    <p class="card-text">Uno de los lagos navegables más altos del mundo, lleno de cultura y paisajes únicos.</p>
-                    <a href="#" class="btn btn-primary mt-auto">Ver más</a>
+        @if (Model != null && Model.Any())
+        {
+            foreach (var tipo in Model)
+            {
+                <div class="col-12 col-md-6 col-lg-4">
+                    <div class="card h-100 shadow-sm">
+                        <!-- Imagen por tipo -->
+                        <img src="@tipo.ImagenUrl" class="card-img-top" alt="@tipo.Nombre"
+                             onerror="this.src='/images/default-tipo.jpg';">
+
+                        <div class="card-body d-flex flex-column">
+                            <h5 class="card-title">@tipo.Nombre</h5>
+                            <p class="card-text">@tipo.Descripcion</p>
+                            <a asp-controller="SitiosTuristicos" asp-action="Index" asp-route-tipoId="@tipo.TipoId"
+                               class="btn btn-primary mt-auto">
+                                Ver Sitios
+                            </a>
+                        </div>
+                    </div>
                 </div>
+            }
+        }
+        else
+        {
+            <div class="text-center text-muted">
+                <p>No hay tipos de tours registrados todavía.</p>
             </div>
-        </div>
-        <!-- Card 2 -->
-        <div class="col-12 col-md-6 col-lg-4">
-            <div class="card h-100 shadow-sm">
-                <img src="/images/destino2.jpg" class="card-img-top" alt="Destino 2">
-                <div class="card-body d-flex flex-column">
-                    <h5 class="card-title">Salar de Uyuni</h5>
-                    <p class="card-text">El desierto de sal más grande del mundo, famoso por su efecto espejo y atardeceres.</p>
-                    <a href="#" class="btn btn-primary mt-auto">Ver más</a>
-                </div>
-            </div>
-        </div>
-        <!-- Card 3 -->
-        <div class="col-12 col-md-6 col-lg-4">
-            <div class="card h-100 shadow-sm">
-                <img src="/images/destino3.jpg" class="card-img-top" alt="Destino 3">
-                <div class="card-body d-flex flex-column">
-                    <h5 class="card-title">La Paz</h5>
-                    <p class="card-text">Una ciudad vibrante en medio de montañas, con teleféricos y cultura ancestral.</p>
-                    <a href="#" class="btn btn-primary mt-auto">Ver más</a>
-                </div>
-            </div>
-        </div>
+        }
     </div>
 </div>
