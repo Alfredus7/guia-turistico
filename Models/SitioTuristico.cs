@@ -17,23 +17,23 @@ namespace guia_turistico.Models
         [Required(ErrorMessage = "El nombre es obligatorio")]
         [StringLength(200)]
         [Display(Name = "Nombre del Sitio")]
-        public string Nombre { get; set; }
+        public string? Nombre { get; set; }
 
         [StringLength(1000)]
         [Display(Name = "Descripción (Español)")]
-        public string Descripcion { get; set; }
+        public string? Descripcion { get; set; }
 
         [StringLength(1000)]
         [Display(Name = "Descripción (Inglés)")]
-        public string DescripcionIngles { get; set; }
+        public string? DescripcionIngles { get; set; }
 
         [StringLength(1000)]
         [Display(Name = "Descripción (Portugués)")]
-        public string DescripcionPortugues { get; set; }
+        public string? DescripcionPortugues { get; set; }
 
         [Display(Name = "Dirección o Referencia")]
         [StringLength(250)]
-        public string Direccion { get; set; }
+        public string? Direccion { get; set; }
 
         // 🌍 Coordenadas para mapa
         [Required]
@@ -50,7 +50,7 @@ namespace guia_turistico.Models
         public int TipoId { get; set; }
 
         [ForeignKey("TipoId")]
-        public virtual Tipo Tipo { get; set; }
+        public virtual Tipo? Tipo { get; set; }
 
         // Galería de imágenes
         public virtual ICollection<ImagenSitio> Imagenes { get; set; } = new List<ImagenSitio>();
