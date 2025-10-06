@@ -11,33 +11,27 @@ namespace guia_turistico.Data
         {
         }
 
-        // DbSets de la aplicación
+        public DbSet<Tipo> Tipos { get; set; }
         public DbSet<SitioTuristico> SitiosTuristicos { get; set; }
         public DbSet<ImagenSitio> ImagenesSitio { get; set; }
         public DbSet<Comentario> Comentarios { get; set; }
 
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        protected override void OnModelCreating(ModelBuilder builder)
         {
-            base.OnModelCreating(modelBuilder);
+            base.OnModelCreating(builder);
 
-            // Configuración opcional: relaciones, restricciones, indices
-            modelBuilder.Entity<SitioTuristico>()
-                .HasMany(s => s.Imagenes)
-                .WithOne(i => i.SitioTuristico)
-                .HasForeignKey(i => i.SitioTuristicoId)
-                .OnDelete(DeleteBehavior.Cascade);
-
-            modelBuilder.Entity<SitioTuristico>()
-                .HasMany(s => s.Comentarios)
-                .WithOne(c => c.SitioTuristico)
+            // Configurar eliminaciones en cascada
+            builder.Entity<Comentario>()
+                .HasOne(c => c.SitioTuristico)
+                .WithMany(s => s.Comentarios)
                 .HasForeignKey(c => c.SitioTuristicoId)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            modelBuilder.Entity<Comentario>()
-                .HasOne(c => c.Usuario)
-                .WithMany()
-                .HasForeignKey(c => c.UsuarioId)
-                .OnDelete(DeleteBehavior.Restrict);
+            builder.Entity<ImagenSitio>()
+                .HasOne(i => i.SitioTuristico)
+                .WithMany(s => s.Imagenes)
+                .HasForeignKey(i => i.SitioTuristicoId)
+                .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

@@ -5,8 +5,9 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace guia_turistico.Models
 {
-   
 
+
+    // 💬 Comentario de usuario (IdentityUser)
     public class Comentario
     {
         [Key]
@@ -14,8 +15,8 @@ namespace guia_turistico.Models
         [Display(Name = "ID Comentario")]
         public int ComentarioId { get; set; }
 
-        [Required(ErrorMessage = "El texto del comentario es obligatorio")]
-        [StringLength(500, ErrorMessage = "El comentario no puede exceder 500 caracteres")]
+        [Required(ErrorMessage = "Debe escribir un comentario")]
+        [StringLength(500)]
         [Display(Name = "Comentario")]
         public string Texto { get; set; }
 
@@ -24,11 +25,10 @@ namespace guia_turistico.Models
         [Display(Name = "Puntuación")]
         public int Puntuacion { get; set; }
 
-        [Required]
-        [Display(Name = "Fecha")]
+        [Display(Name = "Fecha de publicación")]
         public DateTime Fecha { get; set; } = DateTime.Now;
 
-        // Relación con IdentityUser
+        // Usuario Identity
         [Required]
         [Display(Name = "Usuario")]
         public string UsuarioId { get; set; }
@@ -36,7 +36,7 @@ namespace guia_turistico.Models
         [ForeignKey("UsuarioId")]
         public virtual IdentityUser Usuario { get; set; }
 
-        // Relación con SitioTuristico
+        // Sitio turístico
         [Required]
         [Display(Name = "Sitio Turístico")]
         public int SitioTuristicoId { get; set; }
@@ -44,9 +44,9 @@ namespace guia_turistico.Models
         [ForeignKey("SitioTuristicoId")]
         public virtual SitioTuristico SitioTuristico { get; set; }
 
-        // Propiedad no mapeada para mostrar nombre de usuario
+        // Campo no mapeado
         [NotMapped]
-        [Display(Name = "Nombre Usuario")]
+        [Display(Name = "Nombre de Usuario")]
         public string NombreUsuario => Usuario?.UserName;
     }
 }
