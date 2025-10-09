@@ -14,7 +14,7 @@ namespace guia_turistico.Models
         public int Id { get; set; }
 
         [Required(ErrorMessage = "La URL de la imagen es obligatoria")]
-        [StringLength(300)]
+        [StringLength(3000)]
         [Display(Name = "URL de Imagen")]
         public string Url { get; set; }
 

@@ -1,0 +1,58 @@
+﻿@model guia_turistico.Models.ImagenSitio
+
+@{
+    ViewData["Title"] = "Create";
+}
+
+<h1>Create</h1>
+
+<h4>ImagenSitio</h4>
+<hr />
+<div class="row">
+    <div class="col-md-6">
+        <form asp-action="Create" id="imagenForm">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            <!-- Campo para múltiples URLs -->
+            <div class="form-group">
+                <label class="control-label">URLs de Imágenes (una por línea)</label>
+                <textarea name="Urls" class="form-control" rows="5"
+                          placeholder="Ingrese cada URL en una línea separada&#10;Ejemplo:&#10;https://ejemplo.com/imagen1.jpg&#10;https://ejemplo.com/imagen2.jpg"></textarea>
+                <small class="form-text text-muted">Ingrese cada URL en una línea separada</small>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="SitioTuristicoId" class="control-label"></label>
+                <select asp-for="SitioTuristicoId" class="form-control" asp-items="ViewBag.SitioTuristicoId"></select>
+            </div>
+
+            <div class="form-group">
+                <input type="submit" value="Create" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script>
+        // Validación simple para asegurar que hay al menos una URL
+        document.getElementById('imagenForm').addEventListener('submit', function(e) {
+            const textarea = document.querySelector('textarea[name="Urls"]');
+            const urls = textarea.value.split('\n').filter(url => url.trim() !== '');
+
+            if (urls.length === 0) {
+                e.preventDefault();
+                alert('Por favor, ingrese al menos una URL de imagen');
+                textarea.focus();
+            }
+        });
+    </script>
+}

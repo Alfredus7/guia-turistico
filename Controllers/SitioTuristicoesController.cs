@@ -37,7 +37,9 @@ namespace guia_turistico.Controllers
 
             var sitioTuristico = await _context.SitiosTuristicos
                 .Include(s => s.Tipo)
+                .Include(s => s.Imagenes) // ¡Importante incluir las imágenes!
                 .FirstOrDefaultAsync(m => m.Id == id);
+
             if (sitioTuristico == null)
             {
                 return NotFound();

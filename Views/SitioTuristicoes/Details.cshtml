@@ -2,65 +2,132 @@
 
 @{
     ViewData["Title"] = "Details";
+
+    // Obtener el idioma seleccionado
+    var selectedLanguage = Context.Request.Cookies["selectedLanguage"] ?? "es";
 }
 
-<h1>Details</h1>
+<h1>@Html.DisplayFor(model => model.Nombre)</h1>
 
 <div>
-    <h4>SitioTuristico</h4>
-    <hr />
+
+
+    <!-- Carousel de Imágenes -->
+    @if (Model.Imagenes != null && Model.Imagenes.Any())
+    {
+        <div class="row mb-4">
+            <div class="col-md-8 mx-auto">
+                <div id="sitioCarousel" class="carousel slide" data-bs-ride="carousel">
+                    <!-- Indicadores -->
+                    <div class="carousel-indicators">
+                        @for (int i = 0; i < Model.Imagenes.Count; i++)
+                        {
+                            <button type="button" data-bs-target="#sitioCarousel" data-bs-slide-to="@i"
+                                    class="@(i == 0 ? "active" : "")" aria-current="@(i == 0 ? "true" : "false")"
+                                    aria-label="Slide @(i + 1)"></button>
+                        }
+                    </div>
+
+                    <!-- Imágenes -->
+                    <div class="carousel-inner">
+                        @for (int i = 0; i < Model.Imagenes.Count; i++)
+                        {
+                            var imagen = Model.Imagenes.ElementAt(i);
+                            <div class="carousel-item @(i == 0 ? "active" : "")">
+                                <img src="@imagen.Url" class="d-block w-100"
+                                     alt="Imagen de @Model.Nombre"
+                                     style="height: 400px; object-fit: cover;">
+                            </div>
+                        }
+                    </div>
+
+                    <!-- Controles -->
+                    <button class="carousel-control-prev" type="button" data-bs-target="#sitioCarousel" data-bs-slide="prev">
+                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                        <span class="visually-hidden">Previous</span>
+                    </button>
+                    <button class="carousel-control-next" type="button" data-bs-target="#sitioCarousel" data-bs-slide="next">
+                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                        <span class="visually-hidden">Next</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-info text-center">
+            <i class="fas fa-image"></i> No hay imágenes disponibles para este sitio turístico.
+        </div>
+    }
+
     <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Nombre)
+  
+
+        <dt class="col-sm-2">
+            Descripción
         </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Nombre)
+        <dd class="col-sm-10">
+            <!-- Mostrar descripción según el idioma seleccionado -->
+            @switch (selectedLanguage)
+            {
+                case "en":
+                    <span>@(string.IsNullOrEmpty(Model.DescripcionIngles) ? Model.Descripcion : Model.DescripcionIngles)</span>
+                    @if (string.IsNullOrEmpty(Model.DescripcionIngles))
+                    {
+                        <small class="text-muted d-block"><i class="fas fa-info-circle"></i> Descripción no disponible en inglés, mostrando versión en español.</small>
+                    }
+                    break;
+                case "pt":
+                    <span>@(string.IsNullOrEmpty(Model.DescripcionPortugues) ? Model.Descripcion : Model.DescripcionPortugues)</span>
+                    @if (string.IsNullOrEmpty(Model.DescripcionPortugues))
+                    {
+                        <small class="text-muted d-block"><i class="fas fa-info-circle"></i> Descrição não disponível em português, mostrando versão em espanhol.</small>
+                    }
+                    break;
+                default:
+                    <span>@Model.Descripcion</span>
+                    break;
+            }
         </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Descripcion)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Descripcion)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.DescripcionIngles)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.DescripcionIngles)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.DescripcionPortugues)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.DescripcionPortugues)
-        </dd>
-        <dt class = "col-sm-2">
+
+        <dt class="col-sm-2">
             @Html.DisplayNameFor(model => model.Direccion)
         </dt>
-        <dd class = "col-sm-10">
+        <dd class="col-sm-10">
             @Html.DisplayFor(model => model.Direccion)
         </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Latitud)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Latitud)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Longitud)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Longitud)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Tipo)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Tipo.Nombre)
         </dd>
     </dl>
 </div>
+
 <div>
-    <a asp-action="Edit" asp-route-id="@Model?.Id">Edit</a> |
-    <a asp-action="Index">Back to List</a>
+    <a asp-action="Edit" asp-route-id="@Model?.Id" class="btn btn-warning">Edit</a> |
+    <a asp-action="Index" class="btn btn-secondary">Back to List</a>
 </div>
+
+@section Scripts {
+    <script>
+        // Actualizar el script para guardar en cookies también
+        document.addEventListener('DOMContentLoaded', function() {
+            let currentLang = localStorage.getItem('selectedLanguage') || 'es';
+
+            // Guardar en cookie para que el servidor pueda acceder
+            document.cookie = `selectedLanguage=${currentLang}; path=/; max-age=31536000`; // 1 año
+
+            function showSlide(index) {
+                const carousel = new bootstrap.Carousel(document.getElementById('sitioCarousel'));
+                carousel.to(index);
+            }
+
+            // Auto-rotate cada 5 segundos
+            const carouselElement = document.getElementById('sitioCarousel');
+            if (carouselElement) {
+                const carousel = new bootstrap.Carousel(carouselElement, {
+                    interval: 5000,
+                    wrap: true
+                });
+            }
+        });
+    </script>
+}

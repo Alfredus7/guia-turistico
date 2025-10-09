@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/guia_turistico.styles.css" asp-append-version="true" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body class="d-flex flex-column min-vh-100">
     <!-- Barra de navegación -->
@@ -32,10 +33,42 @@
                         <a class="nav-link" asp-area="" asp-controller="SitioTuristicoes" asp-action="Mapa">Mapa</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" asp-area="" asp-controller="Home" asp-action="Index">imagenes</a>
+                        <a class="nav-link" asp-area="" asp-controller="ImagenSitios" asp-action="Index">imagenes</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" asp-area="" asp-controller="Home" asp-action="Index">comentarios</a>
+                    </li>
+
+                    <!-- Dropdown de Idiomas -->
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarLanguageDropdown" role="button"
+                           data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fas fa-language"></i>
+                            <span id="currentLanguageText">
+                                @{
+                                    var currentLang = Context.Request.Cookies["selectedLanguage"] ?? "es";
+                                    switch (currentLang)
+                                    {
+                                        case "en":
+                                            <text>English</text>
+                                            ; break;
+                                        case "pt":
+
+                                            <text>Português</text>
+                                            ; break;
+                                        default:
+
+                                            <text>Español</text>
+                                            ; break;
+                                    }
+                                }
+                            </span>
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="navbarLanguageDropdown">
+                            <li><a class="dropdown-item language-option @(currentLang == "es" ? "active text-primary fw-bold" : "")" href="#" data-lang="es">🇪🇸 Español</a></li>
+                            <li><a class="dropdown-item language-option @(currentLang == "en" ? "active text-primary fw-bold" : "")" href="#" data-lang="en">🇺🇸 English</a></li>
+                            <li><a class="dropdown-item language-option @(currentLang == "pt" ? "active text-primary fw-bold" : "")" href="#" data-lang="pt">🇵🇹 Português</a></li>
+                        </ul>
                     </li>
                 </ul>
                 <partial name="_LoginPartial" />
@@ -62,6 +95,64 @@
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
+
+    <script>
+        // Manejo del cambio de idioma
+        document.addEventListener('DOMContentLoaded', function() {
+            // Obtener idioma actual de localStorage o cookie
+            let currentLang = localStorage.getItem('selectedLanguage');
+            if (!currentLang) {
+                // Si no hay en localStorage, buscar en cookies
+                const cookieValue = document.cookie
+                    .split('; ')
+                    .find(row => row.startsWith('selectedLanguage='))
+                    ?.split('=')[1];
+                currentLang = cookieValue || 'es';
+                localStorage.setItem('selectedLanguage', currentLang);
+            }
+
+            // Actualizar la cookie para el servidor
+            document.cookie = `selectedLanguage=${currentLang}; path=/; max-age=31536000`;
+
+            // Manejar clic en opciones de idioma
+            document.querySelectorAll('.language-option').forEach(option => {
+                option.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const selectedLang = this.getAttribute('data-lang');
+
+                    // Guardar en localStorage
+                    localStorage.setItem('selectedLanguage', selectedLang);
+
+                    // Guardar en cookie
+                    document.cookie = `selectedLanguage=${selectedLang}; path=/; max-age=31536000`;
+
+                    // Forzar recarga completa de la página
+                    window.location.reload(true);
+                });
+            });
+
+            // Actualizar texto del idioma actual en el dropdown
+            updateCurrentLanguageText(currentLang);
+
+            function updateCurrentLanguageText(lang) {
+                const languageText = document.getElementById('currentLanguageText');
+                if (languageText) {
+                    switch(lang) {
+                        case 'en':
+                            languageText.textContent = 'English';
+                            break;
+                        case 'pt':
+                            languageText.textContent = 'Português';
+                            break;
+                        default:
+                            languageText.textContent = 'Español';
+                            break;
+                    }
+                }
+            }
+        });
+    </script>
+
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>
