@@ -15,19 +15,24 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
-// 👥 Configurar Identity con soporte de roles
+// 👥 Configurar Identity con soporte de roles y contraseñas simples (modo desarrollo)
 builder.Services.AddDefaultIdentity<IdentityUser>(options =>
 {
-    options.SignIn.RequireConfirmedAccount = true;
+    options.SignIn.RequireConfirmedAccount = false;   // No requiere confirmación por email
+    options.Password.RequireDigit = false;            // No exige número
+    options.Password.RequireLowercase = false;        // No exige minúsculas
+    options.Password.RequireUppercase = false;        // No exige mayúsculas
+    options.Password.RequireNonAlphanumeric = false;  // No exige símbolos
+    options.Password.RequiredLength = 4;              // Solo 4 caracteres mínimos
 })
-.AddRoles<IdentityRole>() // Soporte de roles
+.AddRoles<IdentityRole>()                             // Soporte de roles
 .AddEntityFrameworkStores<ApplicationDbContext>();
 
 builder.Services.AddControllersWithViews();
 
 var app = builder.Build();
 
-// 🌐 Configuración de cultura — acepta punto como separador decimal
+// 🌐 Configuración de cultura — usa punto como separador decimal
 var cultureInfo = new CultureInfo("en-US");
 CultureInfo.DefaultThreadCurrentCulture = cultureInfo;
 CultureInfo.DefaultThreadCurrentUICulture = cultureInfo;
@@ -48,7 +53,7 @@ using (var scope = app.Services.CreateScope())
 
     string adminRole = "Admin";
     string adminEmail = "admin@admin.com";
-    string adminPassword = "Admin123!";
+    string adminPassword = "Admin123!"; // ⚙️ Contraseña simple para pruebas
 
     // Crear rol Admin si no existe
     if (!await roleManager.RoleExistsAsync(adminRole))
@@ -91,7 +96,7 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
-app.UseAuthentication(); // ⚠️ Agregado: importante para Identity
+app.UseAuthentication(); // ⚠️ Necesario para Identity
 app.UseAuthorization();
 
 // 🧭 Rutas

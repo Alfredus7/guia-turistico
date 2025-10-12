@@ -1,5 +1,7 @@
 ﻿using guia_turistico.Data;
 using guia_turistico.Models;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -14,10 +16,12 @@ namespace guia_turistico.Controllers
     public class SitioTuristicoesController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly UserManager<IdentityUser> _userManager;
 
-        public SitioTuristicoesController(ApplicationDbContext context)
+        public SitioTuristicoesController(ApplicationDbContext context, UserManager<IdentityUser> userManager)
         {
             _context = context;
+            _userManager = userManager;
         }
 
         // GET: SitioTuristicoes
@@ -28,6 +32,7 @@ namespace guia_turistico.Controllers
         }
 
         // GET: SitioTuristicoes/Details/5
+        // GET: SitioTuristicoes/Details/5
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -37,7 +42,9 @@ namespace guia_turistico.Controllers
 
             var sitioTuristico = await _context.SitiosTuristicos
                 .Include(s => s.Tipo)
-                .Include(s => s.Imagenes) // ¡Importante incluir las imágenes!
+                .Include(s => s.Imagenes)
+                .Include(s => s.Comentarios)
+                    .ThenInclude(c => c.Usuario) // 👈 Carga el usuario del comentario
                 .FirstOrDefaultAsync(m => m.Id == id);
 
             if (sitioTuristico == null)
@@ -45,8 +52,17 @@ namespace guia_turistico.Controllers
                 return NotFound();
             }
 
+            // 💡 Recalcular puntuación promedio (por seguridad)
+            if (sitioTuristico.Comentarios.Any())
+            {
+                sitioTuristico.Comentarios = sitioTuristico.Comentarios
+                    .OrderByDescending(c => c.Fecha)
+                    .ToList();
+            }
+
             return View(sitioTuristico);
         }
+
 
         // GET: SitioTuristicoes/Create
         public IActionResult Create()
@@ -176,5 +192,57 @@ namespace guia_turistico.Controllers
         {
             return _context.SitiosTuristicos.Any(e => e.Id == id);
         }
+
+
+        // ---------------------------
+        [Authorize]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> AgregarComentario(int sitioId, int puntuacion, string texto)
+        {
+            if (puntuacion < 1 || puntuacion > 5 || string.IsNullOrWhiteSpace(texto))
+            {
+                TempData["Error"] = "Debe completar todos los campos y seleccionar una puntuación válida.";
+                return RedirectToAction("Details", new { id = sitioId });
+            }
+
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null) return Challenge();
+
+            // Buscar si el usuario ya comentó este sitio
+            var comentarioExistente = await _context.Comentarios
+                .FirstOrDefaultAsync(c => c.SitioTuristicoId == sitioId && c.UsuarioId == user.Id);
+
+            if (comentarioExistente != null)
+            {
+                // 🛠 Actualiza comentario existente
+                comentarioExistente.Texto = texto;
+                comentarioExistente.Puntuacion = puntuacion;
+                comentarioExistente.Fecha = DateTime.Now;
+                _context.Comentarios.Update(comentarioExistente);
+                TempData["Mensaje"] = "Tu comentario ha sido actualizado.";
+            }
+            else
+            {
+                // 🆕 Crea nuevo comentario
+                var comentario = new Comentario
+                {
+                    SitioTuristicoId = sitioId,
+                    Texto = texto,
+                    Puntuacion = puntuacion,
+                    UsuarioId = user.Id,
+                    Fecha = DateTime.Now
+                };
+                _context.Comentarios.Add(comentario);
+                TempData["Mensaje"] = "Tu comentario ha sido agregado.";
+            }
+
+            await _context.SaveChangesAsync();
+            return RedirectToAction("Details", new { id = sitioId });
+        }
+
+
     }
+
+
 }

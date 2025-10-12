@@ -1,24 +1,22 @@
 ﻿@model guia_turistico.Models.SitioTuristico
 
 @{
-    ViewData["Title"] = "Details";
-
-    // Obtener el idioma seleccionado
+    ViewData["Title"] = "Detalles del Sitio Turístico";
     var selectedLanguage = Context.Request.Cookies["selectedLanguage"] ?? "es";
 }
 
-<h1>@Html.DisplayFor(model => model.Nombre)</h1>
-
-<div>
-
+<div class="container my-5">
+    <div class="text-center mb-4">
+        <h1 class="fw-bold display-5">@Model.Nombre</h1>
+        <p class="text-muted">Descubre más sobre este lugar</p>
+    </div>
 
     <!-- Carousel de Imágenes -->
     @if (Model.Imagenes != null && Model.Imagenes.Any())
     {
-        <div class="row mb-4">
-            <div class="col-md-8 mx-auto">
+        <div class="card shadow-lg border-0 mb-5">
+            <div class="card-body p-0">
                 <div id="sitioCarousel" class="carousel slide" data-bs-ride="carousel">
-                    <!-- Indicadores -->
                     <div class="carousel-indicators">
                         @for (int i = 0; i < Model.Imagenes.Count; i++)
                         {
@@ -28,27 +26,25 @@
                         }
                     </div>
 
-                    <!-- Imágenes -->
-                    <div class="carousel-inner">
+                    <div class="carousel-inner rounded-3">
                         @for (int i = 0; i < Model.Imagenes.Count; i++)
                         {
                             var imagen = Model.Imagenes.ElementAt(i);
                             <div class="carousel-item @(i == 0 ? "active" : "")">
                                 <img src="@imagen.Url" class="d-block w-100"
                                      alt="Imagen de @Model.Nombre"
-                                     style="height: 400px; object-fit: cover;">
+                                     style="height: 450px; object-fit: cover;">
                             </div>
                         }
                     </div>
 
-                    <!-- Controles -->
                     <button class="carousel-control-prev" type="button" data-bs-target="#sitioCarousel" data-bs-slide="prev">
                         <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                        <span class="visually-hidden">Previous</span>
+                        <span class="visually-hidden">Anterior</span>
                     </button>
                     <button class="carousel-control-next" type="button" data-bs-target="#sitioCarousel" data-bs-slide="next">
                         <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                        <span class="visually-hidden">Next</span>
+                        <span class="visually-hidden">Siguiente</span>
                     </button>
                 </div>
             </div>
@@ -56,78 +52,177 @@
     }
     else
     {
-        <div class="alert alert-info text-center">
+        <div class="alert alert-info text-center shadow-sm">
             <i class="fas fa-image"></i> No hay imágenes disponibles para este sitio turístico.
         </div>
     }
 
-    <dl class="row">
-  
+    <!-- Información del sitio -->
+    <div class="card shadow-sm border-0 mb-5">
+        <div class="card-body">
+            <dl class="row">
+                <dt class="col-sm-3 fw-bold">Descripción</dt>
+                <dd class="col-sm-9">
+                    @switch (selectedLanguage)
+                    {
+                        case "en":
+                            <span>@(string.IsNullOrEmpty(Model.DescripcionIngles) ? Model.Descripcion : Model.DescripcionIngles)</span>
+                            @if (string.IsNullOrEmpty(Model.DescripcionIngles))
+                            {
+                                <small class="text-muted d-block"><i class="fas fa-info-circle"></i> Descripción no disponible en inglés, mostrando versión en español.</small>
+                            }
+                            break;
+                        case "pt":
+                            <span>@(string.IsNullOrEmpty(Model.DescripcionPortugues) ? Model.Descripcion : Model.DescripcionPortugues)</span>
+                            @if (string.IsNullOrEmpty(Model.DescripcionPortugues))
+                            {
+                                <small class="text-muted d-block"><i class="fas fa-info-circle"></i> Descrição não disponível em português, mostrando versão em espanhol.</small>
+                            }
+                            break;
+                        default:
+                            <span>@Model.Descripcion</span>
+                            break;
+                    }
+                </dd>
 
-        <dt class="col-sm-2">
-            Descripción
-        </dt>
-        <dd class="col-sm-10">
-            <!-- Mostrar descripción según el idioma seleccionado -->
-            @switch (selectedLanguage)
+                <dt class="col-sm-3 fw-bold">Dirección</dt>
+                <dd class="col-sm-9">@Html.DisplayFor(model => model.Direccion)</dd>
+            </dl>
+        </div>
+    </div>
+
+    <!-- Calificación general -->
+    <div class="text-center mb-4">
+        <h3 class="mb-2">⭐ Calificación General: <span class="text-primary">@Model.PuntuacionPromedio.ToString("0.0")</span> / 5</h3>
+        <div>
+            @for (int i = 1; i <= 5; i++)
             {
-                case "en":
-                    <span>@(string.IsNullOrEmpty(Model.DescripcionIngles) ? Model.Descripcion : Model.DescripcionIngles)</span>
-                    @if (string.IsNullOrEmpty(Model.DescripcionIngles))
-                    {
-                        <small class="text-muted d-block"><i class="fas fa-info-circle"></i> Descripción no disponible en inglés, mostrando versión en español.</small>
-                    }
-                    break;
-                case "pt":
-                    <span>@(string.IsNullOrEmpty(Model.DescripcionPortugues) ? Model.Descripcion : Model.DescripcionPortugues)</span>
-                    @if (string.IsNullOrEmpty(Model.DescripcionPortugues))
-                    {
-                        <small class="text-muted d-block"><i class="fas fa-info-circle"></i> Descrição não disponível em português, mostrando versão em espanhol.</small>
-                    }
-                    break;
-                default:
-                    <span>@Model.Descripcion</span>
-                    break;
+                if (i <= Math.Round(Model.PuntuacionPromedio))
+                {
+                    <i class="fas fa-star text-warning fs-4"></i>
+                }
+                else
+                {
+                    <i class="far fa-star text-muted fs-4"></i>
+                }
             }
-        </dd>
+        </div>
+    </div>
 
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Direccion)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Direccion)
-        </dd>
-        </dd>
-    </dl>
-</div>
+    <!-- Formulario de comentarios -->
+    <div class="card shadow-sm border-0 mb-4">
+        <div class="card-body">
+            @if (User.Identity.IsAuthenticated)
+            {
+                <form asp-action="AgregarComentario" method="post" class="needs-validation">
+                    <input type="hidden" name="sitioId" value="@Model.Id" />
+                    @if (TempData["Error"] != null)
+                    {
+                        <div class="alert alert-danger">@TempData["Error"]</div>
+                    }
 
-<div>
-    <a asp-action="Edit" asp-route-id="@Model?.Id" class="btn btn-warning">Edit</a> |
-    <a asp-action="Index" class="btn btn-secondary">Back to List</a>
+                    @if (TempData["Success"] != null)
+                    {
+                        <div class="alert alert-success">@TempData["Success"]</div>
+                    }
+
+                    <div asp-validation-summary="All" class="text-danger mb-3"></div>
+
+                 
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Tu puntuación:</label>
+                        <div id="ratingStars">
+                            @for (int i = 1; i <= 5; i++)
+                            {
+                                <i class="far fa-star star-select text-warning fs-4 mx-1" data-value="@i" style="cursor:pointer;"></i>
+                            }
+                            <input type="hidden" id="puntuacion" name="puntuacion" value="0" />
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="texto" class="form-label fw-semibold">Tu opinión:</label>
+                        <textarea class="form-control shadow-sm" id="texto" name="texto" rows="3" maxlength="500" required></textarea>
+                    </div>
+
+                    <button type="submit" class="btn btn-success px-4">Enviar Opinión</button>
+                </form>
+            }
+            else
+            {
+                <div class="alert alert-warning text-center">
+                    <i class="fas fa-lock"></i> Debes iniciar sesión para dejar tu opinión.
+                </div>
+            }
+        </div>
+    </div>
+
+    <!-- Comentarios -->
+    <div class="mt-5">
+        <h4 class="mb-4">💬 Opiniones de usuarios</h4>
+        @if (Model.Comentarios != null && Model.Comentarios.Any())
+        {
+            foreach (var comentario in Model.Comentarios.OrderByDescending(c => c.Fecha))
+            {
+                <div class="card mb-3 shadow-sm border-0">
+                    <div class="card-body">
+                        <h6 class="fw-bold mb-2">
+                            <i class="fas fa-user-circle"></i> @comentario.NombreUsuario
+                            <small class="text-muted">(@comentario.Fecha.ToShortDateString())</small>
+                        </h6>
+
+                        <div class="mb-2">
+                            @for (int i = 1; i <= 5; i++)
+                            {
+                                if (i <= comentario.Puntuacion)
+                                {
+                                    <i class="fas fa-star text-warning"></i>
+                                }
+                                else
+                                {
+                                    <i class="far fa-star text-muted"></i>
+                                }
+                            }
+                        </div>
+
+                        <p>@comentario.Texto</p>
+                    </div>
+                </div>
+            }
+        }
+        else
+        {
+            <div class="alert alert-info shadow-sm">Aún no hay comentarios. Sé el primero en opinar.</div>
+        }
+    </div>
+
+    <div class="mt-4 text-center">
+        <a asp-action="Edit" asp-route-id="@Model?.Id" class="btn btn-warning me-2">Editar</a>
+        <a asp-action="Index" class="btn btn-secondary">Volver a la lista</a>
+    </div>
 </div>
 
 @section Scripts {
     <script>
-        // Actualizar el script para guardar en cookies también
-        document.addEventListener('DOMContentLoaded', function() {
-            let currentLang = localStorage.getItem('selectedLanguage') || 'es';
+        document.addEventListener("DOMContentLoaded", function() {
+            const stars = document.querySelectorAll(".star-select");
+            const input = document.getElementById("puntuacion");
 
-            // Guardar en cookie para que el servidor pueda acceder
-            document.cookie = `selectedLanguage=${currentLang}; path=/; max-age=31536000`; // 1 año
+            stars.forEach(star => {
+                star.addEventListener("click", () => {
+                    const val = star.getAttribute("data-value");
+                    input.value = val;
 
-            function showSlide(index) {
-                const carousel = new bootstrap.Carousel(document.getElementById('sitioCarousel'));
-                carousel.to(index);
-            }
-
-            // Auto-rotate cada 5 segundos
-            const carouselElement = document.getElementById('sitioCarousel');
-            if (carouselElement) {
-                const carousel = new bootstrap.Carousel(carouselElement, {
-                    interval: 5000,
-                    wrap: true
+                    stars.forEach(s => s.classList.replace("fas", "far"));
+                    for (let i = 0; i < val; i++) {
+                        stars[i].classList.replace("far", "fas");
+                    }
                 });
-            }
+            });
+
+            // Guardar idioma seleccionado en cookie
+            const currentLang = localStorage.getItem('selectedLanguage') || 'es';
+            document.cookie = `selectedLanguage=${currentLang}; path=/; max-age=31536000`;
         });
     </script>
 }
