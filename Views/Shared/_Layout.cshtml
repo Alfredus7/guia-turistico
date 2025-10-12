@@ -24,22 +24,33 @@
                         <a class="nav-link" asp-area="" asp-controller="Home" asp-action="Index">Inicio</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" asp-area="" asp-controller="Tipoes" asp-action="Index">tipo</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" asp-area="" asp-controller="SitioTuristicoes" asp-action="Index">lugar</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" asp-area="" asp-controller="SitioTuristicoes" asp-action="Mapa">Mapa</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" asp-area="" asp-controller="ImagenSitios" asp-action="Index">imagenes</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" asp-area="" asp-controller="Comentarios" asp-action="Index">comentarios</a>
+                        <a class="nav-link" asp-area="" asp-controller="Home" asp-action="Mapa">Mapa</a>
                     </li>
 
-                    <!-- Dropdown de Idiomas -->
+                    
+
+                    <!-- 🔒 Sección visible solo para Admin -->
+                    @if (User.IsInRole("Admin"))
+                    {
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle text-warning" href="#" id="adminDropdown" role="button"
+                               data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="fas fa-tools"></i> Administración
+                            </a>
+                            <ul class="dropdown-menu" aria-labelledby="adminDropdown">
+                                <li><a class="dropdown-item" asp-area="" asp-controller="ImagenSitios" asp-action="Index">Gestión de Imágenes</a></li>
+                                <li><a class="dropdown-item" asp-area="" asp-controller="Comentarios" asp-action="Index">Gestión de Comentarios</a></li>
+                                <li class="nav-item">
+                                    <a class="dropdown-item" asp-area="" asp-controller="Tipoes" asp-action="Index">Tipos</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="dropdown-item" asp-area="" asp-controller="SitioTuristicoes" asp-action="Index">Lugares</a>
+                                </li>
+                            </ul>
+                        </li>
+                    }
+
+                    <!-- 🌐 Selector de idioma -->
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" id="navbarLanguageDropdown" role="button"
                            data-bs-toggle="dropdown" aria-expanded="false">
@@ -71,6 +82,7 @@
                         </ul>
                     </li>
                 </ul>
+
                 <partial name="_LoginPartial" />
             </div>
         </div>

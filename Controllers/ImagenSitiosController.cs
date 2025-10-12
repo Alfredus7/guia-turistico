@@ -54,31 +54,39 @@ namespace guia_turistico.Controllers
         // POST: ImagenSitios/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(List<string> Urls, int SitioTuristicoId)
+        public async Task<IActionResult> Create(string Urls, int SitioTuristicoId)
         {
-            if (Urls != null && Urls.Any(url => !string.IsNullOrWhiteSpace(url)))
+            if (!string.IsNullOrWhiteSpace(Urls))
             {
-                // Filtrar URLs vacías
-                var urlsValidas = Urls.Where(url => !string.IsNullOrWhiteSpace(url)).ToList();
+                // Dividir el texto del textarea por líneas
+                var listaUrls = Urls
+                    .Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries)
+                    .Select(u => u.Trim())
+                    .Where(u => !string.IsNullOrWhiteSpace(u))
+                    .ToList();
 
-                foreach (var url in urlsValidas)
+                if (listaUrls.Count > 0)
                 {
-                    var imagenSitio = new ImagenSitio
+                    foreach (var url in listaUrls)
                     {
-                        Url = url.Trim(),
-                        SitioTuristicoId = SitioTuristicoId
-                    };
-                    _context.Add(imagenSitio);
-                }
+                        var imagenSitio = new ImagenSitio
+                        {
+                            Url = url,
+                            SitioTuristicoId = SitioTuristicoId
+                        };
+                        _context.Add(imagenSitio);
+                    }
 
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                    await _context.SaveChangesAsync();
+                    return RedirectToAction(nameof(Index));
+                }
             }
 
             ViewData["SitioTuristicoId"] = new SelectList(_context.SitiosTuristicos, "Id", "Nombre", SitioTuristicoId);
             ModelState.AddModelError("", "Debe ingresar al menos una URL válida.");
             return View();
         }
+
 
         // GET: ImagenSitios/Edit/5
         public async Task<IActionResult> Edit(int? id)

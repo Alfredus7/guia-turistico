@@ -7,7 +7,6 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -31,39 +30,6 @@ namespace guia_turistico.Controllers
             return View(await applicationDbContext.ToListAsync());
         }
 
-        // GET: SitioTuristicoes/Details/5
-        // GET: SitioTuristicoes/Details/5
-        public async Task<IActionResult> Details(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var sitioTuristico = await _context.SitiosTuristicos
-                .Include(s => s.Tipo)
-                .Include(s => s.Imagenes)
-                .Include(s => s.Comentarios)
-                    .ThenInclude(c => c.Usuario) // 👈 Carga el usuario del comentario
-                .FirstOrDefaultAsync(m => m.Id == id);
-
-            if (sitioTuristico == null)
-            {
-                return NotFound();
-            }
-
-            // 💡 Recalcular puntuación promedio (por seguridad)
-            if (sitioTuristico.Comentarios.Any())
-            {
-                sitioTuristico.Comentarios = sitioTuristico.Comentarios
-                    .OrderByDescending(c => c.Fecha)
-                    .ToList();
-            }
-
-            return View(sitioTuristico);
-        }
-
-
         // GET: SitioTuristicoes/Create
         public IActionResult Create()
         {
@@ -76,22 +42,18 @@ namespace guia_turistico.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(SitioTuristico sitio)
+        public async Task<IActionResult> Create([Bind("Id,Nombre,NombreIngles,NombrePortugues,Descripcion,DescripcionIngles,DescripcionPortugues,Direccion,Latitud,Longitud,TipoId")] SitioTuristico sitioTuristico)
         {
             if (ModelState.IsValid)
             {
-                // Asegurar que las coordenadas se lean con punto decimal
-                sitio.Latitud = Convert.ToDouble(sitio.Latitud.ToString(), CultureInfo.InvariantCulture);
-                sitio.Longitud = Convert.ToDouble(sitio.Longitud.ToString(), CultureInfo.InvariantCulture);
-
-                _context.Add(sitio);
+                _context.Add(sitioTuristico);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["TipoId"] = new SelectList(_context.Tipos, "TipoId", "Nombre", sitio.TipoId);
-            return View(sitio);
+            ViewData["TipoId"] = new SelectList(_context.Tipos, "TipoId", "Nombre", sitioTuristico.TipoId);
+            return View(sitioTuristico);
         }
-
+       
 
         // GET: SitioTuristicoes/Edit/5
         public async Task<IActionResult> Edit(int? id)
@@ -110,20 +72,12 @@ namespace guia_turistico.Controllers
             return View(sitioTuristico);
         }
 
-        public IActionResult Mapa()
-        {
-            var sitios = _context.SitiosTuristicos.ToList();
-            return View(sitios);
-        }
-
-
-
         // POST: SitioTuristicoes/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Nombre,Descripcion,DescripcionIngles,DescripcionPortugues,Direccion,Latitud,Longitud,TipoId")] SitioTuristico sitioTuristico)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Nombre,NombreIngles,NombrePortugues,Descripcion,DescripcionIngles,DescripcionPortugues,Direccion,Latitud,Longitud,TipoId")] SitioTuristico sitioTuristico)
         {
             if (id != sitioTuristico.Id)
             {
@@ -193,7 +147,6 @@ namespace guia_turistico.Controllers
             return _context.SitiosTuristicos.Any(e => e.Id == id);
         }
 
-
         // ---------------------------
         [Authorize]
         [HttpPost]
@@ -242,7 +195,37 @@ namespace guia_turistico.Controllers
         }
 
 
+
+        // GET: SitioTuristicoes/Details/5
+        // GET: SitioTuristicoes/Details/5
+        public async Task<IActionResult> Details(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var sitioTuristico = await _context.SitiosTuristicos
+                .Include(s => s.Tipo)
+                .Include(s => s.Imagenes)
+                .Include(s => s.Comentarios)
+                    .ThenInclude(c => c.Usuario) // 👈 Carga el usuario del comentario
+                .FirstOrDefaultAsync(m => m.Id == id);
+
+            if (sitioTuristico == null)
+            {
+                return NotFound();
+            }
+
+            // 💡 Recalcular puntuación promedio (por seguridad)
+            if (sitioTuristico.Comentarios.Any())
+            {
+                sitioTuristico.Comentarios = sitioTuristico.Comentarios
+                    .OrderByDescending(c => c.Fecha)
+                    .ToList();
+            }
+
+            return View(sitioTuristico);
+        }
     }
-
-
 }

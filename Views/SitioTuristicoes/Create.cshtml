@@ -11,11 +11,21 @@
 <div class="row">
     <div class="col-md-4">
         <form asp-action="Create">
-            <div asp-validation-summary="All" class="text-danger"></div>
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
                 <label asp-for="Nombre" class="control-label"></label>
                 <input asp-for="Nombre" class="form-control" />
                 <span asp-validation-for="Nombre" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="NombreIngles" class="control-label"></label>
+                <input asp-for="NombreIngles" class="form-control" />
+                <span asp-validation-for="NombreIngles" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="NombrePortugues" class="control-label"></label>
+                <input asp-for="NombrePortugues" class="form-control" />
+                <span asp-validation-for="NombrePortugues" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <label asp-for="Descripcion" class="control-label"></label>
@@ -39,16 +49,14 @@
             </div>
             <div class="form-group">
                 <label asp-for="Latitud" class="control-label"></label>
-                <input asp-for="Latitud" type="text" class="form-control" placeholder="-14.8288333" />
+                <input asp-for="Latitud" class="form-control" />
                 <span asp-validation-for="Latitud" class="text-danger"></span>
             </div>
-
             <div class="form-group">
                 <label asp-for="Longitud" class="control-label"></label>
-                <input asp-for="Longitud" type="text" class="form-control" placeholder="-64.9123524" />
+                <input asp-for="Longitud" class="form-control" />
                 <span asp-validation-for="Longitud" class="text-danger"></span>
             </div>
-
             <div class="form-group">
                 <label asp-for="TipoId" class="control-label"></label>
                 <select asp-for="TipoId" class ="form-control" asp-items="ViewBag.TipoId"></select>

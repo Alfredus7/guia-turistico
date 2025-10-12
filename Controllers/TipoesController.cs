@@ -54,7 +54,7 @@ namespace guia_turistico.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("TipoId,Nombre,Descripcion,ImagenUrl")] Tipo tipo)
+        public async Task<IActionResult> Create([Bind("TipoId,Nombre,NombreIngles,NombrePortugues,Descripcion,DescripcionIngles,DescripcionPortugues,ImagenUrl")] Tipo tipo)
         {
             if (ModelState.IsValid)
             {
@@ -86,7 +86,7 @@ namespace guia_turistico.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("TipoId,Nombre,Descripcion,ImagenUrl")] Tipo tipo)
+        public async Task<IActionResult> Edit(int id, [Bind("TipoId,Nombre,NombreIngles,NombrePortugues,Descripcion,DescripcionIngles,DescripcionPortugues,ImagenUrl")] Tipo tipo)
         {
             if (id != tipo.TipoId)
             {

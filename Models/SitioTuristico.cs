@@ -19,6 +19,14 @@ namespace guia_turistico.Models
         [Display(Name = "Nombre del Sitio")]
         public string? Nombre { get; set; }
 
+        [StringLength(100)]
+        [Display(Name = "Nombre (Inglés)")]
+        public string? NombreIngles { get; set; }
+
+        [StringLength(100)]
+        [Display(Name = "Nombre (Portugués)")]
+        public string? NombrePortugues { get; set; }
+
         [StringLength(1000)]
         [Display(Name = "Descripción (Español)")]
         public string? Descripcion { get; set; }

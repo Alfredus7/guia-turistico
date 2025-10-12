@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace guia_turistico.Models
@@ -12,19 +11,37 @@ namespace guia_turistico.Models
         [Display(Name = "ID Tipo")]
         public int TipoId { get; set; }
 
+        // 🗣️ Nombre por idioma
         [Required(ErrorMessage = "El nombre del tipo es obligatorio")]
         [StringLength(100)]
-        [Display(Name = "Nombre del Tipo o Tour")]
+        [Display(Name = "Nombre (Español)")]
         public string Nombre { get; set; }
 
-        [StringLength(300)]
-        [Display(Name = "Descripción")]
-        public string Descripcion { get; set; }
+        [StringLength(100)]
+        [Display(Name = "Nombre (Inglés)")]
+        public string? NombreIngles { get; set; }
+
+        [StringLength(100)]
+        [Display(Name = "Nombre (Portugués)")]
+        public string? NombrePortugues { get; set; }
+
+        // 📄 Descripciones por idioma
+        [StringLength(500)]
+        [Display(Name = "Descripción (Español)")]
+        public string? Descripcion { get; set; }
+
+        [StringLength(500)]
+        [Display(Name = "Descripción (Inglés)")]
+        public string? DescripcionIngles { get; set; }
+
+        [StringLength(500)]
+        [Display(Name = "Descripción (Portugués)")]
+        public string? DescripcionPortugues { get; set; }
 
         // 🖼️ Imagen representativa del tipo (ej. /images/tipos/aventura.jpg)
         [StringLength(250)]
         [Display(Name = "Imagen del Tipo o Tour")]
-        public string ImagenUrl { get; set; }
+        public string? ImagenUrl { get; set; }
 
         // 🔗 Relación con sitios turísticos
         public virtual ICollection<SitioTuristico> Sitios { get; set; } = new List<SitioTuristico>();

@@ -1,9 +1,10 @@
 using guia_turistico.Data;
+using guia_turistico.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System.Diagnostics;
 using System.Linq;
-using guia_turistico.Models;
 
 namespace guia_turistico.Controllers
 {
@@ -20,12 +21,33 @@ namespace guia_turistico.Controllers
 
         public IActionResult Index()
         {
-            // Cargamos todos los tipos (categorías de tour)
+            // Cargar tipos
             var tipos = _context.Tipos.ToList();
+
+            // Calcular top 3 sitios mejor puntuados con su imagen principal
+            var topSitios = _context.SitiosTuristicos
+                .Include(s => s.Imagenes) // incluye relaciÃ³n con ImagenSitio
+                .Select(s => new
+                {
+                    Sitio = s,
+                    ImagenUrl = s.Imagenes.FirstOrDefault().Url ?? "/images/default-sitio.jpg",
+                    Promedio = _context.Comentarios
+                        .Where(c => c.SitioTuristicoId == s.Id)
+                        .Average(c => (double?)c.Puntuacion) ?? 0
+                })
+                .OrderByDescending(x => x.Promedio)
+                .Take(3)
+                .ToList();
+
+            ViewBag.TopSitios = topSitios;
             return View(tipos);
         }
 
-        public IActionResult Privacy() => View();
+        public IActionResult Mapa()
+        {
+            var sitios = _context.SitiosTuristicos.ToList();
+            return View(sitios);
+        }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
