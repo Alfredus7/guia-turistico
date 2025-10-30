@@ -193,10 +193,25 @@ namespace guia_turistico.Controllers
             await _context.SaveChangesAsync();
             return RedirectToAction("Details", new { id = sitioId });
         }
+        public async Task<IActionResult> PorTipo(int tipoId)
+        {
+            var tipo = await _context.Tipos.FirstOrDefaultAsync(t => t.TipoId == tipoId);
 
+            if (tipo == null)
+                return NotFound();
 
+            var sitios = await _context.SitiosTuristicos
+                .Where(s => s.TipoId == tipoId)
+                .Include(s => s.Tipo)
+                .Include(s => s.Imagenes)
+                .ToListAsync();
 
-        // GET: SitioTuristicoes/Details/5
+            ViewBag.TipoNombre = tipo.Nombre;
+            ViewBag.TipoNombreIngles = tipo.NombreIngles;
+            ViewBag.TipoNombrePortugues = tipo.NombrePortugues;
+
+            return View(sitios);
+        }
         // GET: SitioTuristicoes/Details/5
         public async Task<IActionResult> Details(int? id)
         {

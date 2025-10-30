@@ -119,7 +119,7 @@
                                         break;
                                 }
                             </p>
-                            <a asp-controller="SitiosTuristicos" asp-action="Details" asp-route-id="@sitio.Id"
+                            <a asp-controller="SitioTuristicoes" asp-action="Details" asp-route-id="@sitio.Id"
                                class="btn btn-outline-primary mt-auto">
                                 @switch (selectedLanguage)
                                 {
@@ -235,7 +235,9 @@
                                         break;
                                 }
                             </p>
-                            <a asp-controller="SitiosTuristicos" asp-action="Index" asp-route-tipoId="@tipo.TipoId"
+                            <a asp-controller="SitioTuristicoes"
+                               asp-action="PorTipo"
+                               asp-route-tipoId="@tipo.TipoId"
                                class="btn btn-primary mt-auto">
                                 @switch (selectedLanguage)
                                 {
@@ -253,6 +255,7 @@
                                         break;
                                 }
                             </a>
+
                         </div>
                     </div>
                 </div>
